@@ -1,0 +1,16 @@
+name: 财富日报自动运行
+
+on:
+  schedule:
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 测试运行
+        run: |
+          echo "财富日报系统启动成功"
+          date
