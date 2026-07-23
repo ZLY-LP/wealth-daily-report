@@ -1,16 +1,30 @@
 name: 财富日报自动运行
 
 on:
-  schedule:
-    - cron: '0 23 * * *'
   workflow_dispatch:
 
 jobs:
-  daily:
+  send-email:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 测试运行
-        run: |
-          echo "财富日报系统启动成功"
-          date
+      - name: 发送测试邮件
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.qq.com
+          server_port: 465
+          username: ${{ secrets.QQ_EMAIL }}
+          password: ${{ secrets.QQ_PASSWORD }}
+          subject: 财富日报系统测试成功
+          to: ${{ secrets.QQ_EMAIL }}
+          from: ${{ secrets.QQ_EMAIL }}
+          body: |
+            恭喜！
+            
+            你的财富日报自动推送系统已经运行成功。
+
+            下一步将接入：
+            AI资讯分析
+            行业趋势
+            经济观察
+            商业机会分析
