@@ -10,23 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 发送测试邮件
+
+      - name: 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 设置Python环境
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: 生成财富日报
+        run: |
+          python main.py > report.txt
+
+      - name: 发送财富日报邮件
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.qq.com
           server_port: 465
           username: ${{ secrets.QQ_EMAIL }}
           password: ${{ secrets.QQ_PASSWORD }}
-          subject: 财富日报系统测试成功
+          subject: 财富日报
           to: ${{ secrets.QQ_EMAIL }}
           from: ${{ secrets.QQ_EMAIL }}
-          body: |
-            早上好！
-
-            财富日报自动推送系统已运行成功。
-
-            下一步将接入：
-            AI资讯分析
-            行业趋势
-            经济观察
-            商业机会分析
+          body: file://report.txt
