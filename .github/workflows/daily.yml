@@ -1,6 +1,8 @@
 name: 财富日报自动运行
 
 on:
+  schedule:
+    - cron: "0 23 * * *"
   workflow_dispatch:
 
 jobs:
