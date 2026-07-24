@@ -19,6 +19,10 @@ jobs:
         with:
           python-version: "3.x"
 
+      - name: 安装依赖
+        run: |
+          pip install -r requirements.txt
+
       - name: 生成财富日报
         run: |
           python main.py > report.txt
