@@ -20,7 +20,7 @@ jobs:
           from: ${{ secrets.QQ_EMAIL }}
           body: |
             恭喜！
-            
+
             你的财富日报自动推送系统已经运行成功。
 
             下一步将接入：
