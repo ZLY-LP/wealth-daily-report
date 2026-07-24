@@ -3,55 +3,70 @@ from datetime import datetime
 from deep_translator import GoogleTranslator
 
 
-# ===============================
-# 翻译函数
-# ===============================
-
 def translate_text(text):
     try:
-        result = GoogleTranslator(
+        return GoogleTranslator(
             source="auto",
             target="zh-CN"
         ).translate(text)
-
-        return result
-
-    except Exception:
+    except:
         return text
 
 
 
-# ===============================
-# 新闻读取函数
-# ===============================
+def format_time(item):
 
-def get_news(title, url, count=5):
+    if hasattr(item, "published"):
+        return item.published
+
+    elif hasattr(item, "updated"):
+        return item.updated
+
+    else:
+        return "时间未知"
+
+
+
+def get_news(section, source, url, count=5):
 
     print("\n")
     print("=" * 45)
-    print(title)
+    print(section)
     print("=" * 45)
 
+    print("新闻来源：" + source)
+
     try:
+
         feed = feedparser.parse(url)
 
         if not feed.entries:
+
             print("暂无最新资讯")
             return []
 
-        news_list = []
+        result=[]
+
 
         for item in feed.entries[:count]:
 
-            original = item.title
+            title = translate_text(
+                item.title
+            )
 
-            chinese = translate_text(original)
+            time = format_time(item)
 
-            news_list.append(chinese)
+            print("\n【发布时间】")
+            print(time)
 
-            print(chinese)
+            print("【新闻】")
+            print(title)
 
-        return news_list
+
+            result.append(title)
+
+
+        return result
 
 
     except Exception as e:
@@ -62,28 +77,25 @@ def get_news(title, url, count=5):
 
 
 
-# ===============================
-# 日期
-# ===============================
-
-today = datetime.now().strftime("%Y-%m-%d")
+today=datetime.now().strftime("%Y-%m-%d")
 
 
 print("财富日报")
-print("日期：" + today)
+print("日期："+today)
 
 
 
-all_news = []
+all_news=[]
 
 
 
-# ===============================
+# ============================
 # 全球经济
-# ===============================
+# ============================
 
-news = get_news(
+news=get_news(
     "🌏 全球经济雷达",
+    "BBC Business",
     "https://feeds.bbci.co.uk/news/business/rss.xml",
     5
 )
@@ -92,12 +104,14 @@ all_news.extend(news)
 
 
 
-# ===============================
+# ============================
 # AI科技
-# ===============================
+# ============================
 
-news = get_news(
+
+news=get_news(
     "🤖 AI科技前沿",
+    "Google AI Blog",
     "https://blog.google/technology/ai/rss/",
     5
 )
@@ -106,12 +120,14 @@ all_news.extend(news)
 
 
 
-# ===============================
+# ============================
 # 科技趋势
-# ===============================
+# ============================
 
-news = get_news(
+
+news=get_news(
     "🚀 科技产业趋势",
+    "MIT Technology Review",
     "https://www.technologyreview.com/feed/",
     5
 )
@@ -120,124 +136,144 @@ all_news.extend(news)
 
 
 
-# ===============================
+# ============================
 # 中国经济观察
-# ===============================
+# ============================
+
 
 print("\n")
-print("=" * 45)
+print("="*45)
 print("🇨🇳 中国经济观察")
-print("=" * 45)
+print("="*45)
 
 
 print("""
+新闻来源：
+中国政府公开信息
+
 重点关注：
 
-1. 宏观政策变化
-2. 新能源产业
-3. 人工智能产业
-4. 制造业升级
-5. 消费趋势
+- 宏观经济政策
+- 产业升级
+- 科技创新
+- 制造业发展
+- 消费趋势
 
-（后续增加中国权威RSS数据源）
+说明：
+中国权威RSS数据将在后续版本接入。
 """)
 
 
 
-# ===============================
-# 商业机会观察
-# ===============================
+# ============================
+# 商业机会
+# ============================
+
 
 print("\n")
-print("=" * 45)
+print("="*45)
 print("💼 商业机会观察")
-print("=" * 45)
+print("="*45)
 
 
 
-keywords = {
+opportunities=[]
 
-    "AI": "人工智能应用、企业自动化、智能软件方向值得关注",
 
-    "人工智能": "AI产业链、应用落地、企业服务可能出现机会",
+rules={
 
-    "energy": "能源产业、资源价格变化值得关注",
+"AI":
+"人工智能应用、企业自动化、智能软件服务",
 
-    "能源": "新能源、能源管理方向值得关注",
+"人工智能":
+"AI应用生态、企业数字化服务",
 
-    "technology": "科技创新和产业升级可能带来机会",
+"能源":
+"新能源产业链、能源管理技术",
+
+"电":
+"能源基础设施升级",
+
+"医疗":
+"AI医疗、生命科学技术",
+
+"机器人":
+"机器人应用和智能制造"
+
 
 }
 
 
 
-matched = False
+for key,value in rules.items():
 
+    for n in all_news:
 
-for key,value in keywords.items():
+        if key in n:
 
-    for news in all_news:
-
-        if key.lower() in news.lower():
-
-            print(value)
-
-            matched = True
+            opportunities.append(value)
 
             break
 
 
 
-if not matched:
+if opportunities:
+
+    for i,o in enumerate(set(opportunities),1):
+
+        print(
+            str(i)+"."+o
+        )
+
+else:
 
     print("""
 今日重点关注：
 
-科技创新、
-产业升级、
-数字化转型。
+1. 技术创新带来的产业变化
 
-持续观察长期趋势变化。
+2. 企业效率提升机会
+
+3. 新兴行业长期趋势
 """)
 
 
 
-# ===============================
+# ============================
 # 财富思维
-# ===============================
+# ============================
 
 
 print("\n")
-print("=" * 45)
+print("="*45)
 print("📚 财富思维")
-print("=" * 45)
+print("="*45)
 
 
-thoughts = [
+thoughts=[
 
-"投资不是预测未来，而是理解长期趋势。",
+"真正的财富来自理解趋势，而不是追逐热点。",
 
-"信息差创造机会，认知差决定结果。",
+"优秀投资者研究产业变化，而不是预测每天涨跌。",
 
-"优秀投资者关注变化，而不是追逐噪音。",
+"长期机会往往隐藏在技术进步和社会变化中。",
 
-"财富增长来自长期积累和正确选择。",
+"提高认知，是普通人最值得投资的资产。",
 
-"看懂产业变化，比预测短期价格更重要。"
+"信息很多，关键是找到影响未来的变化。"
 
 ]
 
 
-index = datetime.now().day % len(thoughts)
-
-
-print(thoughts[index])
+print(
+    thoughts[
+        datetime.now().day % len(thoughts)
+    ]
+)
 
 
 
 print("\n")
-print("=" * 45)
-
+print("="*45)
 print("本日报由财富日报自动系统生成")
-
-print("=" * 45)
+print("="*45)
