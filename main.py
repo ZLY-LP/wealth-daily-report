@@ -3,66 +3,31 @@ from datetime import datetime, timezone, timedelta
 from deep_translator import GoogleTranslator
 
 
+output = []
+
+
+def write(text=""):
+    print(text)
+    output.append(text)
+
+
+
 # ===============================
 # 翻译
 # ===============================
 
 def translate_text(text):
+
     try:
+
         return GoogleTranslator(
             source="auto",
             target="zh-CN"
         ).translate(text)
 
     except:
+
         return text
-
-
-
-# ===============================
-# 新闻价值过滤
-# ===============================
-
-def useful_news(title):
-
-    keywords = [
-
-        "market",
-        "economy",
-        "economic",
-        "business",
-        "trade",
-        "oil",
-        "energy",
-        "bank",
-        "rate",
-        "inflation",
-        "AI",
-        "artificial",
-        "technology",
-        "chip",
-        "cloud",
-        "robot",
-        "policy",
-        "industry",
-        "company",
-        "investment",
-        "finance"
-
-    ]
-
-
-    text = title.lower()
-
-
-    for k in keywords:
-
-        if k.lower() in text:
-
-            return True
-
-
-    return False
 
 
 
@@ -73,43 +38,51 @@ def useful_news(title):
 
 def detect_country(text):
 
-    t=text.lower()
+    t = text.lower()
 
 
     if any(x in t for x in [
         "china",
         "中国",
-        "beijing",
-        "人民币"
+        "人民币",
+        "beijing"
     ]):
+
         return "🇨🇳 中国"
 
 
+
     if any(x in t for x in [
-        "us",
+        "usa",
+        "us ",
         "america",
         "美国",
         "google",
         "openai",
-        "nasa"
+        "microsoft"
     ]):
+
         return "🇺🇸 美国"
+
 
 
     if any(x in t for x in [
         "uk",
         "britain",
-        "英国",
-        "london"
+        "英国"
     ]):
+
         return "🇬🇧 英国"
+
 
 
     if any(x in t for x in [
         "japan",
         "日本"
     ]):
+
         return "🇯🇵 日本"
+
 
 
     if any(x in t for x in [
@@ -117,7 +90,9 @@ def detect_country(text):
         "eu",
         "欧洲"
     ]):
+
         return "🇪🇺 欧洲"
+
 
 
     return "🌐 国际"
@@ -134,12 +109,12 @@ def get_time(item):
 
     try:
 
-        utc=datetime(
+        utc = datetime(
             *item.published_parsed[:6],
             tzinfo=timezone.utc
         )
 
-        bj=utc+timedelta(hours=8)
+        bj = utc + timedelta(hours=8)
 
 
         return bj.strftime(
@@ -148,73 +123,111 @@ def get_time(item):
 
     except:
 
-        return "时间未知"
+        return "未知"
 
 
 
 
 
 # ===============================
-# 新闻影响分析
+# 新闻过滤
 # ===============================
 
-def impact_analysis(text):
+def useful_news(title):
+
+    keys=[
+
+        "economy",
+        "market",
+        "trade",
+        "business",
+        "energy",
+        "oil",
+        "AI",
+        "technology",
+        "chip",
+        "robot",
+        "finance",
+        "bank",
+        "rate",
+        "policy",
+        "industry"
+
+    ]
+
+
+    t=title.lower()
+
+
+    for k in keys:
+
+        if k.lower() in t:
+
+            return True
+
+
+    return False
+
+
+
+
+
+# ===============================
+# 新闻分析
+# ===============================
+
+def impact(text):
 
     t=text.lower()
 
 
     if "ai" in t or "人工智能" in t:
 
-        return (
-            "影响方向：AI应用、企业自动化、软件服务"
-        )
+        return "影响方向：人工智能应用、软件服务、企业效率提升"
 
 
-    if "oil" in t or "能源" in t:
 
-        return (
-            "影响方向：能源价格、制造成本、资源产业"
-        )
+    if "oil" in t or "energy" in t:
 
-
-    if "trade" in t or "关税" in t:
-
-        return (
-            "影响方向：全球贸易、供应链、出口企业"
-        )
+        return "影响方向：能源价格、产业成本、资源市场"
 
 
-    if "rate" in t or "利率" in t:
 
-        return (
-            "影响方向：金融市场、房地产、消费"
-        )
+    if "trade" in t or "tariff" in t:
+
+        return "影响方向：全球贸易、供应链、制造业"
 
 
-    return (
-        "影响方向：关注产业变化和长期趋势"
-    )
+
+    if "rate" in t:
+
+        return "影响方向：金融市场、房地产、消费"
+
+
+
+    return "影响方向：产业趋势和长期投资机会"
+
 
 
 
 
 
 # ===============================
-# 新闻读取
+# RSS读取
 # ===============================
 
 def get_news(title,source,url,count=5):
 
 
-    print("\n")
-    print("="*45)
-
-    print(title)
-
-    print("="*45)
+    write("\n")
+    write("="*45)
+    write(title)
+    write("="*45)
 
 
-    print("新闻来源：",source)
+    write(
+        "新闻来源："+source
+    )
 
 
     feed=feedparser.parse(url)
@@ -227,43 +240,49 @@ def get_news(title,source,url,count=5):
 
 
         if num>=count:
+
             break
 
 
-        original=item.title
-
-
-        if not useful_news(original):
+        if not useful_news(item.title):
 
             continue
 
 
         chinese=translate_text(
-            original
+            item.title
         )
 
 
         country=detect_country(
-            original+" "+chinese
+            item.title+" "+chinese
         )
 
 
-        print("\n【新闻】",num+1)
+        write("")
 
-        print("国家/地区：")
-        print(country)
-
-
-        print("发布时间：")
-        print(get_time(item))
+        write(
+            "【新闻】"+str(num+1)
+        )
 
 
-        print("事件：")
-        print(chinese)
+        write(
+            "国家/地区："+country
+        )
 
 
-        print(
-            impact_analysis(chinese)
+        write(
+            "发布时间："+get_time(item)
+        )
+
+
+        write(
+            "事件："+chinese
+        )
+
+
+        write(
+            impact(chinese)
         )
 
 
@@ -271,33 +290,24 @@ def get_news(title,source,url,count=5):
 
 
 
-    if num==0:
-
-        print(
-            "暂无高价值资讯"
-        )
-
-
-
 
 
 # ===============================
-# 开始日报
+# 开始
 # ===============================
 
 
-print("财富日报")
+write("财富日报")
 
-print(
-"日期："+
-datetime.now().strftime("%Y-%m-%d")
+write(
+    "日期："+datetime.now().strftime("%Y-%m-%d")
 )
 
 
 
-all_news=[]
 
 
+# 全球经济
 
 get_news(
 
@@ -305,13 +315,14 @@ get_news(
 
 "BBC Business",
 
-"https://feeds.bbci.co.uk/news/business/rss.xml",
-
-5
+"https://feeds.bbci.co.uk/news/business/rss.xml"
 
 )
 
 
+
+
+# AI
 
 get_news(
 
@@ -319,13 +330,14 @@ get_news(
 
 "Google AI Blog",
 
-"https://blog.google/technology/ai/rss/",
-
-5
+"https://blog.google/technology/ai/rss/"
 
 )
 
 
+
+
+# 科技
 
 get_news(
 
@@ -333,9 +345,7 @@ get_news(
 
 "MIT Technology Review",
 
-"https://www.technologyreview.com/feed/",
-
-5
+"https://www.technologyreview.com/feed/"
 
 )
 
@@ -347,29 +357,84 @@ get_news(
 # ===============================
 
 
-print("\n")
-print("="*45)
+write("\n")
+write("="*45)
 
-print("🇨🇳 中国经济观察")
+write("🇨🇳 中国经济观察")
 
-print("="*45)
+write("="*45)
 
 
-print("""
-来源：
-中国官方公开信息
 
-重点观察：
+get_news(
 
-1. 宏观政策
-2. 产业升级
-3. 制造业变化
-4. 科技创新
-5. 消费趋势
+"中国政策观察",
 
-后续接入稳定数据源。
-""")
+"中国政府网",
 
+"https://www.gov.cn/rss/zhengce.xml",
+
+3
+
+)
+
+
+
+
+# ===============================
+# 全球市场
+# ===============================
+
+
+write("\n")
+write("="*45)
+
+write("📈 全球市场观察")
+
+write("="*45)
+
+
+
+get_news(
+
+"市场动态",
+
+"Reuters Business",
+
+"https://feeds.reuters.com/reuters/businessNews",
+
+5
+
+)
+
+
+
+
+# ===============================
+# 地缘资源
+# ===============================
+
+
+write("\n")
+write("="*45)
+
+write("🌍 地缘资源观察")
+
+write("="*45)
+
+
+
+get_news(
+
+"能源与供应链",
+
+"BBC Business",
+
+"https://feeds.bbci.co.uk/news/business/rss.xml",
+
+3
+
+)
 
 
 
@@ -379,31 +444,27 @@ print("""
 # ===============================
 
 
-print("\n")
-print("="*45)
+write("\n")
+write("="*45)
 
-print("💼 商业机会观察")
+write("💼 商业机会观察")
 
-print("="*45)
+write("="*45)
 
 
-print("""
-今日重点关注：
 
+write("""
 1. AI企业服务
 
-人工智能从技术突破走向商业应用，
-软件服务和自动化工具值得长期关注。
-
+人工智能商业化仍是长期趋势。
 
 2. 能源产业链
 
-能源价格变化可能影响上下游产业。
-
+关注能源价格变化带来的产业机会。
 
 3. 数字化升级
 
-传统行业效率提升仍存在大量机会。
+传统行业效率提升存在机会。
 """)
 
 
@@ -415,41 +476,62 @@ print("""
 # ===============================
 
 
-print("\n")
-print("="*45)
+write("\n")
+write("="*45)
 
-print("📚 财富思维")
+write("📚 财富思维")
 
-print("="*45)
+write("="*45)
 
 
 
-words=[
+thoughts=[
 
-"真正的机会，来自看懂变化之后的行动。",
+"真正的财富来自理解变化。",
 
-"关注产业趋势，比追逐短期热点更重要。",
+"投资机会往往隐藏在产业升级中。",
 
-"财富增长，本质是认知不断升级。",
+"长期主义是财富积累的重要能力。",
 
-"信息很多，判断力才是稀缺能力。"
+"信息只是资源，认知才是优势。"
 
 ]
 
 
-print(
-words[
-datetime.now().day % len(words)
-]
+write(
+    thoughts[
+        datetime.now().day % len(thoughts)
+    ]
 )
 
 
 
-print("\n")
-print("="*45)
 
-print(
+write("\n")
+write("="*45)
+
+write(
 "本日报由财富日报自动系统生成"
 )
 
-print("="*45)
+write("="*45)
+
+
+
+
+
+# ===============================
+# 保存日报文件
+# ===============================
+
+
+with open(
+    "wealth_daily.txt",
+    "w",
+    encoding="utf-8"
+) as f:
+
+
+    f.write(
+        "\n".join(output)
+    )
