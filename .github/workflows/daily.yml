@@ -2,7 +2,7 @@ name: 财富日报自动运行
 
 on:
   schedule:
-    - cron: "0 23 * * *"
+    - cron: "0 1 * * *"
   workflow_dispatch:
 
 jobs:
@@ -21,9 +21,9 @@ jobs:
           to: ${{ secrets.QQ_EMAIL }}
           from: ${{ secrets.QQ_EMAIL }}
           body: |
-            恭喜！
+            早上好！
 
-            你的财富日报自动推送系统已经运行成功。
+            财富日报自动推送系统已运行成功。
 
             下一步将接入：
             AI资讯分析
