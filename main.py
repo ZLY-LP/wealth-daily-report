@@ -1,57 +1,66 @@
+import feedparser
 from datetime import datetime
 
-# 生成财富日报内容
+
+def get_news(title, url, count=5):
+    print("\n" + title)
+    print("=" * 30)
+
+    feed = feedparser.parse(url)
+
+    for item in feed.entries[:count]:
+        print("• " + item.title)
+
 
 today = datetime.now().strftime("%Y-%m-%d")
 
-report = f"""
-财富日报
 
-日期：{today}
+print("财富日报")
+print("日期：" + today)
 
-====================
-
-【今日全球经济观察】
-
-1. 全球市场动态：
-等待接入实时数据。
-
-2. 大宗商品：
-等待接入实时数据。
-
-3. 汇率与利率：
-等待接入实时数据。
+print("\n============================")
 
 
-====================
-
-【AI科技趋势】
-
-今日AI观察：
-
-等待接入AI资讯。
-
-
-====================
-
-【商业机会观察】
-
-今日机会：
-
-等待接入行业分析。
+# AI科技资讯
+get_news(
+    "🤖 AI科技前沿",
+    "https://feeds.feedburner.com/oreilly/radar",
+    5
+)
 
 
-====================
+# 全球财经资讯
+get_news(
+    "🌏 全球财经观察",
+    "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+    5
+)
 
-【财富思维】
 
-持续学习：
-认知决定选择，
-信息决定机会。
+# 科技资讯
+get_news(
+    "🚀 科技趋势",
+    "https://www.technologyreview.com/feed/",
+    5
+)
 
-====================
 
-本日报由财富日报自动系统生成。
-"""
+print("\n============================")
 
-print(report)
+print("""
+💼 商业机会观察
+
+根据今日资讯持续跟踪：
+AI应用
+科技创新
+产业变化
+全球经济趋势
+
+============================
+
+📚 财富思维
+
+持续获取信息，
+提升认知，
+寻找长期机会。
+""")
