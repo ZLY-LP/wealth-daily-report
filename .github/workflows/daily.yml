@@ -2,39 +2,76 @@ name: 财富日报自动运行
 
 on:
   schedule:
-    - cron: "0 1 * * *"
+    # 北京时间每天上午9点
+    # GitHub Actions 使用UTC时间，所以为凌晨1点
+    - cron: '0 1 * * *'
+
   workflow_dispatch:
 
+
 jobs:
-  send-email:
+
+  daily:
+
     runs-on: ubuntu-latest
+
 
     steps:
 
       - name: 拉取代码
+
         uses: actions/checkout@v4
 
+
+
       - name: 设置Python环境
+
         uses: actions/setup-python@v5
+
         with:
-          python-version: "3.x"
+
+          python-version: '3.11'
+
+
 
       - name: 安装依赖
+
         run: |
+
           pip install -r requirements.txt
 
-      - name: 生成财富日报
-        run: |
-          python main.py > report.txt
 
-      - name: 发送财富日报邮件
+
+      - name: 运行财富日报
+
+        run: |
+
+          python main.py
+
+
+
+      - name: 发送邮件
+
         uses: dawidd6/action-send-mail@v3
+
         with:
+
           server_address: smtp.qq.com
+
           server_port: 465
+
           username: ${{ secrets.QQ_EMAIL }}
+
           password: ${{ secrets.QQ_PASSWORD }}
-          subject: 财富日报
+
+          subject: 财富日报自动推送
+
           to: ${{ secrets.QQ_EMAIL }}
+
           from: ${{ secrets.QQ_EMAIL }}
-          body: file://report.txt
+
+          body: |
+
+            财富日报已经生成。
+
+            请查看邮件内容。
